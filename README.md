@@ -30,3 +30,25 @@ Nama usaha dan informasi produk merupakan bagian dari prototipe tugas perkuliaha
 
 ## Pengembang
 Mahasiswa Program Studi Teknologi Informasi
+
+---
+
+## Cek Pemahaman & Refleksi Sprint (Pertemuan 5)
+
+### Cek Pemahaman
+1. **Mengapa validasi HTML saja tidak cukup?**  
+   Validasi HTML hanya berjalan di sisi *client* (browser) dan mudah dimatikan. Validasi PHP di sisi *server* wajib ada agar data yang masuk ke database tetap aman.
+2. **Apa beda GET dan POST?**  
+   GET mengirim data via URL (terlihat jelas), cocok untuk mengambil data (`edit_produk.php?id=1`). POST mengirim data secara tersembunyi di dalam *request body*, cocok untuk manipulasi database.
+3. **Mengapa delete perlu konfirmasi?**  
+   Untuk mencegah data terhapus secara tidak sengaja (*accidental deletion*) karena perintah hapus di database bersifat permanen.
+4. **Di bagian mana aturan penyimpanan dikoordinasikan?**  
+   Di sisi *backend* PHP sebelum query dieksekusi, serta dijaga oleh *Prepared Statement* PDO dan *Foreign Key* database.
+
+### Refleksi
+1. **Apa yang sudah dipahami?**  
+   Alur CRUD PHP PDO, relasi tabel `products` & `categories`, serta integrasi database ke *landing page* dinamis.
+2. **Kendala & Solusi:**  
+   Pemisahan alur antara halaman pengunjung (`index.php`) dan halaman admin (`admin.php`), diselesaikan dengan mengatur ulang navigasi dan *redirect header*.
+3. **Kontribusi:**  
+   Membangun fungsi CRUD backend, merancang database MySQL, dan menyusun tampilan antarmuka web UMKM Dapur Hulonthalo.
