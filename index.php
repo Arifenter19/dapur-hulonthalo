@@ -1,16 +1,3 @@
-<?php
-require_once 'koneksi.php';
-
-// Ambil semua produk beserta nama kategorinya dari database
-$query = "SELECT products.*, categories.nama_kategori 
-          FROM products 
-          LEFT JOIN categories ON products.category_id = categories.id 
-          ORDER BY products.id DESC";
-$stmt = $pdo->prepare($query);
-$stmt->execute();
-$products = $stmt->fetchAll();
-?>
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -164,30 +151,59 @@ $products = $stmt->fetchAll();
     <div class="container" id="katalog">
         <h2 class="section-title">Katalog Produk Kami</h2>
 
-        <div class="grid-produk">
-            <?php if (count($products) > 0): ?>
-                <?php foreach ($products as $row): ?>
-                    <div class="card-produk">
-                        <div class="card-body">
-                            <span class="badge-kategori"><?= htmlspecialchars($row['nama_kategori'] ?? 'Kue Khas'); ?></span>
-                            <h3 class="nama-produk"><?= htmlspecialchars($row['nama_produk']); ?></h3>
-                            <p class="deskripsi-produk"><?= htmlspecialchars($row['deskripsi']); ?></p>
-                        </div>
-                        <div class="card-footer">
-                            <span class="harga-produk">Rp <?= number_format($row['harga'], 0, ',', '.'); ?></span>
-                            <a href="#" class="btn-pesan">Pesan</a>
-                        </div>
-                    </div>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <p style="text-align: center; grid-column: 1 / -1;">Belum ada produk kue yang ditampilkan.</p>
-            <?php endif; ?>
+        <!-- Tempat produk dimuat secara dinamis via REST API -->
+        <div class="grid-produk" id="grid-produk">
+            <p style="text-align: center; grid-column: 1 / -1;">Memuat data kue dari REST API...</p>
         </div>
     </div>
 
     <footer>
         <p>&copy; <?= date('Y'); ?> Dapur Hulonthalo. All rights reserved. | <a href="admin.php">Kelola Website</a></p>
     </footer>
+
+    <!-- Script JavaScript untuk mengambil data REST API -->
+    <script>
+        async function muatKatalogDariAPI() {
+            const container = document.getElementById('grid-produk');
+            try {
+                const response = await fetch('api/products.php');
+                const result = await response.json();
+
+                if (response.ok && result.data && result.data.length > 0) {
+                    container.innerHTML = '';
+                    result.data.forEach(row => {
+                        const nama = row.nama_produk || row.name || 'Produk Kue';
+                        const deskripsi = row.deskripsi || row.description || '';
+                        const harga = row.harga || row.price || 0;
+                        const kategori = row.category_name || 'Kue Khas';
+                        const hargaFormat = new Intl.NumberFormat('id-ID').format(harga);
+
+                        const card = `
+                            <div class="card-produk">
+                                <div class="card-body">
+                                    <span class="badge-kategori">${kategori}</span>
+                                    <h3 class="nama-produk">${nama}</h3>
+                                    <p class="deskripsi-produk">${deskripsi}</p>
+                                </div>
+                                <div class="card-footer">
+                                    <span class="harga-produk">Rp ${hargaFormat}</span>
+                                    <a href="#" class="btn-pesan">Pesan</a>
+                                </div>
+                            </div>
+                        `;
+                        container.innerHTML += card;
+                    });
+                } else {
+                    container.innerHTML = '<p style="text-align: center; grid-column: 1 / -1;">Belum ada produk kue yang ditampilkan.</p>';
+                }
+            } catch (error) {
+                console.error('Error fetching API:', error);
+                container.innerHTML = '<p style="text-align: center; color: red; grid-column: 1 / -1;">Gagal memuat data produk dari API.</p>';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', muatKatalogDariAPI);
+    </script>
 
 </body>
 </html>
